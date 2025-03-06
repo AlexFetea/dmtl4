@@ -46,6 +46,12 @@ example : Q := Q.mk
 -- Can prove N?
 def r : N := _    -- No. There's no proof term for it!
 
+def np : P → Empty
+| P.mk => _
+
+-- Proof of ~N
+def nn : N → Empty := fun n => nomatch n
+
 /- @@@
 ## The Logical Connectives
 
@@ -144,6 +150,10 @@ is, in three equivalent versions: fully written out; using
 Lean's ⟨_, _⟩ notation for the default *mk* constructor; and
 finally all on one line, as an explicit function term.
 @@@ -/
+
+-- P ∧ Q → P
+example : P × Q → P := fun (h : P × Q) => h.fst
+example : P × Q → P := fun ⟨ p, q ⟩  => p
 
 def andCommutative : P × Q → Q × P
 | Prod.mk p q  => Prod.mk q p
@@ -270,8 +280,11 @@ Notice that we *must* do a case analysis to deal
 the the disjunction.
 @@@ -/
 
+
+-- P ∧ (Q ∨ R) → (P ∧ Q ∨ P ∧ R)
 example : P × (Q ⊕ R) → (P × Q ⊕ P × R)
-| ⟨ p, Sum.inl q ⟩ => Sum.inl ⟨ p, q ⟩
+| Prod.mk p (Sum.inl q)  => Sum.inl (Prod.mk p q)
+| ⟨ p, Sum.inr r ⟩ => Sum.inr ⟨ p, r ⟩ -- w/ notation
 -- you write the second missing case
 
 /-@@@
@@ -288,6 +301,8 @@ into our current embedding of predicate logic in Lean
 
 - P ∧ (Q ∧ R) → (P ∧ Q) ∧ R   -- and is associative
 - P ∨ (Q ∨ R) → (P ∨ Q) ∨ R   -- or is associative
+
+
 - ¬(P ∧ Q) → ¬P ∨ ¬Q
 - ¬(P ∨ Q) → ¬P ∧ ¬Q
 - ¬(P ∧ N)
@@ -295,16 +310,89 @@ into our current embedding of predicate logic in Lean
 
 @@@ -/
 
--- Your answers here
+/-
+One of the  valid theorems of proposition logic
+is this part of one of DeMorgan's Laws explaining
+how negation distributes over conjunctions.
+-/
+-- ¬(P ∧ Q) → (¬P ∨ ¬Q)
+example : (~(P × Q)) → (~P) ⊕ (~Q) :=
+    -- assume (P ∧ Q) → Empty
+    -- show P → Empty
+  fun (h : ~(P × Q)) =>
+    Sum.inr _
+
+/- @@@
+At this point we're stuck. In constructive logic,
+just knowing that P ∧ Q is false is not enough to
+give you a proof of either ¬P or of ¬Q. This is an
+example of a theorem in propositional logic (valid)
+that is not valid in the constructive logic of Lean.
+@@@ -/
+
+/- @@@
+What about in the other direction?
+@@@ -/
+
+example: (~P) ⊕ (~Q) → (~(P × Q)) :=
+fun (h : (~P) ⊕ ~Q) =>
+  fun pandq =>
+    match h with
+    | Sum.inl np => np pandq.fst
+    | Sum.inr nq => nq pandq.snd
+
+
+/- HOMEWORK 9!
+The other of DeMorgan's laws explains how negation
+distributes over disjunctions. In the forward direction
+it proposes that if you know what P or Q is false, which
+means neither is true, then at least one of them must be
+false. Classically that makes sense. Is this theorem of
+propositional logical also valid in Lean?
+-/
+
+-- ¬(P ∨ Q) -> ¬P ∧ ¬Q
+
+example : (~(P ⊕ Q)) -> (~P) × (~Q) :=
+fun (h : (~(P ⊕ Q))) =>
+  (
+    fun p => h (Sum.inl p),
+    fun q => h (Sum.inr q)
+  )
+
+example : (~P) × (~Q) → (~(P ⊕ Q)) :=
+fun (np, nq) h =>
+  match h with
+  | Sum.inl p => np p
+  | Sum.inr q => nq q
+
 
 
 /- @@@
-## Extra Credit
+In classical logic we know it's false that both P
+and ¬P are true. Is that also true in constructive
+logic? Prove it if you can.
+@@@ -/
+example : ~(P × (~P)) :=
+fun (p, np) => np p
 
-Not all of the axioms that are valid in propositional
-logic are valid in our embedding of constructive logic
-into Lean. One that's not is negation elimination: that
-is, *¬¬P → P*. Try to prove it in the stype we've used
-here here and explain exactly where things go wrong (in
-a comment).
+
+
+
+/- @@@
+What about the axiom of negation elimination? That is,
+¬¬P ↔ P. Is it valid in both directions, one direction,
+or neither?
+@@@ -/
+
+example : P → (~(~P)) :=
+λ p => fun np => np p
+
+/- @@@
+Ok, so, even in constructive logic, from a proof of
+P we can derive a proof of ¬¬P. How about in the other
+direction?
 -/
+example : (~(~P)) → P :=
+_
+-- Not provable constructively
