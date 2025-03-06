@@ -1,10 +1,10 @@
 
 # Summary
 
-[Preface](./introduction.md)
+[Preface](./preface.md)
 
 ---
-****
+
 - [Languages](./languages.md)
   
 - [Propositional Logic](./propLogic.md)
@@ -46,9 +46,10 @@
   - [Propositions as Logical Types](./DMT1/Lectures/L07_predicateLogic/01_propsAsLogicalTypes.lean.md)
   - [Classical Reasoning](./DMT1/Lectures/L07_predicateLogic/03_classicalReasoning.lean.md)
   - [Predicates](./DMT1/Lectures/L07_predicateLogic/04_predicates.lean.md)
-  - [Quantifiers](./DMT1/Lectures/L07_predicateLogic/04_quantifiers.lean.md)
-    - [For All](./DMT1/Lectures/L07_predicateLogic/04_quantifiers_all.lean.md)
-    - [Exists](./DMT1/Lectures/L07_predicateLogic/04_quantifiers_exists.lean.md)
+  - [Quantifiers](./DMT1/Lectures/L07_predicateLogic/05_quantifiers.lean.md)
+    - [For All](./DMT1/Lectures/L07_predicateLogic/05_quantifiers_all.lean.md)
+    - [Exists](./DMT1/Lectures/L07_predicateLogic/05_quantifiers_exists.lean.md)
+  - [Dependent Type Theory](./DMT1/Lectures/L07_predicateLogic/06_dependentTypes.lean.md)
   
 - [Sets and Relations](./setTheory)
   - [Sets as Unary Predicates](./DMT1/Lectures/L08_setsRelationsFunctions/01_sets.lean.md)
