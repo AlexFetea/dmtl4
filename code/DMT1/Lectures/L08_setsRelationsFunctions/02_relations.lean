@@ -240,7 +240,7 @@ two arguments, ignores them, and reduces to the membership
 proposition, True. As there's always a proof of True, the
 membership proposition is true for every pair of values,
 so every pair of values is defined to be in the relation.
-Here's a general definition of the total relation on any
+Here's a general definition of the complete relation on any
 two types, α and β.
 @@@ -/
 
@@ -257,9 +257,9 @@ set theoretic notation we could define fullStringNat as
 { (s,n ) | True }. In the type theory of Lean, specify the
 relation using by defining its membership predicate.
 
-As an example, we define completeStrNat as the total
+As an example, we define completeStrNat as the complete
 relation from String to Nat values. Be sure you see
-what *totalRel String Nat* reduces to. What predicate
+what *completeRel String Nat* reduces to. What predicate
 is it, exactly, as expressed formally in Lean. Do not
 proceed if you're not sure, rather go back and figure
 it out.
@@ -289,7 +289,7 @@ the definition of completeStrNat, what is to be proved is True."
 Then prove that membership proposition.
 @@@ -/
 
--- Prove ("Hello", 7) is in the total relation on String and Nat
+-- Prove ("Hello", 7) is in the complete relation on String and Nat
 example : completeStrNat "Hello" 7 :=
   -- By the definition of completeStrNat, all we have to prove True
   -- The proof is by True introduction
@@ -418,19 +418,19 @@ We want to take a moment at this point to note a critical
 distinction between *relations* in Lean and functions that
 are represented as lambda expressions (ordinary computable
 functions in Lean). Functions in Lean and related systems
-are (1) computable, and (2) total, which is to say for *any*
+are (1) computable, and (2) complete, which is to say for *any*
 value of the declared input type a function must return some
 value of the output type.
 
-By contrast, relations in Lean need not be total. We have
+By contrast, relations in Lean need not be compelte. We have
 already seen an example in  (with a defined output for every
 input); and they can be multi-valued, with several outputs for
 any given input.
 
-Concerning totality, a quick look back at the empty relation
+Concerning completeness, a quick look back at the empty relation
 makes the point: the domain of definition is every value, but
 the relation has no pairs: it does not define an output for
-any of them. As far as being multi-valued, consider the total
+any of them. As far as being multi-valued, consider the complete
 relation defined about. It defines *every* value of the output
 type as an output for each and every value of the input type.
 
@@ -634,102 +634,170 @@ example : ¬strlen "Hello" 4 := fun h => nomatch h
 
 
 /- @@@
-## Fundamental Definitions
+## Elements of a Binary Relation
 In this section, we define important terms and underlying
 concepts in the theory of relations. To illustrate the ideas,
 we'll refer back to our running examples.
 @@@ -/
 
 /- @@@
-Given any relation on sets (types) α and β, we will refer to
-α as the *domain of definition*, and β as the *co-domain* of
-the relation. The domain of definition is the set of possible
-inputs and the co-domain is the set of all possible outputs.
-For each the relations we've considered as examples so far
-(completeStrNat, strlen, and strlen3) are the sets of *all*
-the values of the types, String and Nat, respectively.
 
-The domain of definition and the codomain of each of the relations
-we've specified as examples are all values of type α = String and
-all values of type β = Nat, respectively.
+### Domain of Definition and Co-Domain
 
-The set of values, (a : α), that r *does* relate to β values,
-i.e., the set of values that do appear in the first position of
-any ordered pair, (a : α, b : β) in r, is called the *domain*
-of r. The domain of r is the set of values on which r is said
-to be *defined*. It's the set of *input* values, (a : α), for
-which r specifies at least one output value, (b : β).
+Given any relation, $r$ on sets of types, *α* and *β*,
+the *domain of definition* of *r* *(r.dom)* is the set,
+given by a type in Lean, from which all possible inputs
+to *r* (left elements pairs) are drawn. The co-domain is
+the set, in Lean the type, of all possible output values
+(right elements of pairs).
 
-More formally, given a relation, r : Rel α β, the domain of r is
-defined to be the set { x : α | ∃ y : β, r x y }. Another way to
-say this is that the domain of r is the set of α values specified
-by the predicate, fun x => ∃ y, r x y. In other words, x : α is
-in  the domain of r if any only if there's some y : β such that
-the pair of values, x, y, satisfies the two-place predicate r.
+We will speak in type theoretical terms, and thus have
+specified the domain of definition and co-domain sets as
+types. This is nice as Lean can now typecheck values to
+see if they're in these sets.
 
-In Lean, if r is a binary relation (Rel.dom r) is its domain set.
-We can define the domain of definition and the domain of any binary
-relation as follows.
+Now we can specify any binary relation from α (input side)
+to β (output side) values, as a *predicate, p, on *α* and
+*β*, thus being of type *(p : α → β → Prop)*. Lean, as we
+have seen, provides the polymorphic type, *Rel α β* as an
+abstraction from *α → β → Prop*, used particularly when a
+predicate is representing a binary relation, in particular.
+
+With that representation, we can now see how we can return
+the *domain of definition* of *r*, as the sets of all values
+(the *universals* sets) of types, α, and β, respectively.
+@@@ -/
+
+def domDef (r : Rel α β) : Set α := Set.univ
+def codom (r : Rel α β) : Set β := Set.univ
+
+/- @@@
+Let's see some applications.
+@@@ -/
+
+-- The domain of definition of strlen3 is a set of strings
+-- The codomain of strlen3 is a set atural numbers
+
+#check (domDef strlen3)
+#check (codom strlen3)
+
+-- Its domain of definition is the set of all strings
+-- Its codomain is the set of all natural numbers
+
+#reduce (domDef strlen3)
+#reduce (codom strlen3)
+
+
+
+/- @@@
+### Domain and Range of a Binary Relation on α and β
+
+We now define what it means for a set to be, respectively,
+the *domain* or the *range* of *r*. The *domain* of *r* is
+the set of all *(a : α)* values for which *r* there is some
+corresponding β value, *b*, such that the pair *(a, b)* is
+in the relation *r*. Similarly, the *range* of *r* is the
+set of all output values, *(b : β)* for which there is some
+input value, *(a : α),* where *r* relates *a* and *b*.
 @@@ -/
 
 def dom (r : Rel α β) : Set α := { a | ∃ b, r a b }
-def domdef (r : Rel α β) : Type := α
+def ran (r : Rel α β) : Set β := { b | ∃ a, r a b }
+
+-- Let's look at some applications
+
+
+-- set types
+#check dom strlen3    -- a set of strings
+#check ran strlen3    -- a set of natural numbers
+
+-- set values
+#reduce dom strlen3   -- fun a => ∃ b, strlen3 a b
+#reduce ran strlen3   -- fun b => ∃ a, strlen3 a b
+
+
+-- /- @@@
+-- The domain of definition and the codomain of each of the relations
+-- we've specified as examples are all values of type α = String and
+-- all values of type β = Nat, respectively.
+
+-- The set of values, (a : α), that r *does* relate to β values,
+-- i.e., the set of values that do appear in the first position of
+-- any ordered pair, (a : α, b : β) in r, is called the *domain*
+-- of r. The domain of r is the set of values on which r is said
+-- to be *defined*. It's the set of *input* values, (a : α), for
+-- which r specifies at least one output value, (b : β).
+
+-- More formally, given a relation, r : Rel α β, the domain of r is
+-- defined to be the set { x : α | ∃ y : β, r x y }. Another way to
+-- say this is that the domain of r is the set of α values specified
+-- by the predicate, fun x => ∃ y, r x y. In other words, x : α is
+-- in  the domain of r if any only if there's some y : β such that
+-- the pair of values, x, y, satisfies the two-place predicate r.
+
+-- In Lean, if r is a binary relation (Rel.dom r) is its domain set.
+-- We can define the domain of definition and the domain of any binary
+-- relation as follows.
+-- @@@ -/
+
+-- def dom (r : Rel α β) : Set α := { a | ∃ b, r a b }
+-- def domDef (r : Rel α β) : Type := α
+
+-- /- @@@
+-- The *domain of definition* of a relation is thus the set of
+-- possible input values, that can appear as first arguments in
+-- membership propostions. The *domain* of a relation is the subset
+-- of its domain of definition for which there are corresponding
+-- output values. The codomain is the set of values (type in Lean)
+-- containing all possible output values. The range of a relation
+-- is the subset of values in the codomaim for which there really
+-- are corresonding related input values in the domain.
+-- @@@ -/
+
+-- def codom (r : Rel α β) : Type := β
+-- def ran (r : Rel α β) : Set β := { b | ∃ a, r a b }
 
 /- @@@
-The *domain of definition* of a relation is thus the set of
-possible input values, that can appear as first arguments in
-membership propostions. The *domain* of a relation is the subset
-of its domain of definition for which there are corresponding
-output values. The codomain is the set of values (type in Lean)
-containing all possible output values. The range of a relation
-is the subset of values in the codomaim for which there really
-are corresonding related input values in the domain.
-@@@ -/
+### Lean's Definitions
 
-def codom (r : Rel α β) : Type := β
-def ran (r : Rel α β) : Set β := { b | ∃ a, r a b }
+We didn's have to define these operations ourselves, as Lean
+provides them to us from its libraries. In particular, *Rel.dom*
+reduces to the domain of any relation, and Rel.codom *sadly*
+reduces to its range as we've defined these terms here.
+@@@ --/
 
 #reduce (types := true) Rel.dom r
 -- fun x => ∃ y, r x y
 
-/- @@@
-Regrettably, Lean defines *codom* as the *range* of a relation.
-As I said in class, these terms are used somewhat inconcistenty
-in the mathematics literature. For this class we'll stick with
-the *concepts* as we've defined them here, with the *range* of a
-relation being the set of all output values for which there is
-a corresponding input.
-@@@ -/
 #reduce (types := true) Rel.codom r
 -- fun y => ∃ x, r x y
 
+-- /- @@@
+-- Regrettably, Lean defines *codom* to be what we have called
+-- the *range* of a relation.
+-- As I said in class, these terms are used somewhat inconcistenty
+-- in the mathematics literature. For this class we'll stick with
+-- the *concepts* as we've defined them here, with the *range* of a
+-- relation being the set of all output values for which there is
+-- a corresponding input.
+-- @@@ -/
+
+
 /- @@@
-As a concrete example, the domain of definition of completeStrNat
-is the set of all values of type α represented here by α itself.
-This set is also the domain of this relation, as the relation
-associates *every* value of this type with a corresponding output
-value.
+### More Examples
 
-The domain of definition of *strlen3* is similarly *String*,
-but its *domain* is a proper subset, { "Hello", "Lean", "!"}.
-The domain of definition of an *empty* relation is the set of
-all values of the input type, but the domain is ∅, the empty
-set.
-
-Lean defines these concepts in its standard Libraries. Here
-you can see them in action.
+We'll start by looking at the domains of a few of the relations
+we've already introduced.
 @@@ -/
 
 #reduce Rel.dom strlen
 -- fun x => ∃ y, strlen x y
--- the set of x values for which there's some y value in strlen
+-- think of this as the set  { x | ∃ y, strlen x y}
 
 #reduce Rel.dom emptyStrNat
 -- fun x => ∃ y, emptyStrNat x y
--- equivalent to { x | ∃ y, emptyStrNat x y }
--- but ∃ y, emptyStrNat x y reduces to False
--- this can also be written as { x | ∃ y, False}
--- no x values satisfy False, so this set is empty
+-- think of this as { x | ∃ y, emptyStrNat x y }
+-- equivalently { x | ∃ y, False }
 
 /- @@@
 We can now prove, for example, that "Hello" ∈ strlen3.dom.
@@ -1155,8 +1223,63 @@ example : 2 ∈ acctsOf.image { "Mary" } := _
 -- Exercise: Prove that 3 is NOT one of Mary's bank accounts
 -- HERE:
 
+
 /- @@@
-## Example: The Cartesian Unit Circle as a Relation
+## A Most Fundamental Relation: Equality
+
+The Equality Relation in Lean, called *Eq* is defined as an
+inductive type whose values are proofs of equalities between
+terms *up to reduction*. The *=* symbol is an infix notation
+for *Eq*, so instead of writing *Eq a b* we can write *a = b*.
+
+Such an equality proposition has a proof if and only if both
+sides *reduce* to the same term. For example, *1 + 1 = 2* has
+a proof because *1 + 1* reduces to *2*, leaving only *2 = 2*
+to be proved. The single proof constructor for *Eq*, called
+*Eq.refl,* takes any value of any type, (a : α) and constructs
+a proof of *a = a*. Applying it to *2* thus yields a proof of
+*2 = 2*, and that's what we wanted to confirm.
+@@@ -/
+
+example : 1 + 1 = 2 := rfl
+
+/- @@@
+Here's the definition of the equality type in Lean.
+@@@ -/
+
+#check Eq     -- right click and go to definition
+
+/- @@@
+```lean
+inductive Eq : α → α → Prop where
+  | refl (a : α) : Eq a a
+```
+
+The first line establishes that *Eq* takes two arguments,
+*a* and *b*, and yields the proposition, *Eq a b,* which
+with infix notation is usually written *a = b*. The second
+line provides the sole means of proving an equality. It
+takes *1* argument, *a*, and return a proof that *a = a*.
+@@@ -/
+
+example : 1 + 1 = 2 := Eq.refl 2
+
+/- @@@
+So what about rfl? Here's how it's defined.
+
+```lean
+ rfl {α : Sort u} {a : α} : Eq a a := Eq.refl a
+```
+
+It's special power is that it infers both *α* and
+*a* and returns a proof of *a = a* by reducing to
+*Eq.refl a*. It works so long as Lean can infer both
+values. If not, then use *Eq.refl a*.
+@@@-/
+
+
+/- @@@
+## Example: The Unit Circle in the Cartesian Plane
 
 The unit circle in the Cartesian plane is the set of points,
 represented by ordered pairs of real numbers, *(x, y)*, that
@@ -1193,14 +1316,15 @@ example : unitCircle 0 (-1) := rfl    -- doesn't work!
 
 /- @@@
 That didn't work! The problem is that the real numbers
-are not computable so Lean will not just reduce *0² + 1²*
-to *1*. One *cannot* compute real numbers, but rather must
-reason about them based on the axioms used to define them.
+*are not computable* (!) so Lean cannot reduce *0² + 1²*
+to *1* computationally. Instead, opne must must *reason*
+logically reals based on the axioms used to define them
+and theorems already proved from those axioms. One must
+*deduce* that *0² + 1²*.
 
-In this particular case, one must *deduce* that *0² + 1²*.
-One can do this reasoning entirely on one's own, but it is
-tedious and requires an understanding of complex definitions
-and previously proved theorems about real numbers.
+You can do such reasoning entirely on your own, but it is
+tedious and requires an understanding of definitions and
+previously proved theorems about real numbers.
 
 The good news is that Lean provides a vast library of programs
 that *automate* aspects of proof construction. These programs,
@@ -1212,55 +1336,76 @@ the particular problem we face right here.
 @@@ -/
 
 /- @@@
-## Tactics for Automated Proof Construction in Lean
+## Tactics: Automating Steps in Proof Construction
 
-A tactic is not a proof term, but rather a program that
-someone wrote in Lean that automates an attempt to construct
-an actual proof term. One of the most widely used tactics in
-Lean is called *simp*. It tries to apply a set of definitions
-to simplify a goal so that you don't have to do it yourself.
-In lucky cases, it will simplify a goal to an equality that
-can finally be proven by Eq.refl or rfl, which the tactic is
-happy to apply for you.
+A tactic is not a proof term, but rather a program, that
+someone wrote, in Lean, that *attempt* to construct a proof
+term for the current goal. These terms usually have remaining
+*holes* to be filled in, which become the new *goals* to be
+proved.
 
-Here then is a demonstration that there is a formal
-proof that *(0, -1)* is on the unit circle. You must
-understand that *simp* (and tactics more generally)
-automatically construct proof terms. You don't see
-the actual *proof term* here, but you can see that
-the Lean prover has accepted it, so you can rest easy
-knowing that the proposition that *(0, -1)* is on the
-unit circle is valud. Here we tell *simp* to use not
-only the set of general definitions it knows about
-but also, crucially, the definition of unitCircle.
-The keyword, *by*, kicks Lean into *tactic mode*.
-In general you can intermix the *term* and *tactic*
-modes flexibly in constructing proofs in Lean.
+### The simp Automates Reasoning to Simplify Expressions
+
+One of the most widely used tactics in Lean is called *simp*.
+It has a default database of already accepted definitions, e.g.,
+of functions, theorems, etc., and tries to find a way to apply
+them to simplify a goal so that you don't have to do by hand,
+
+In the best cases, it will simplify a goal to an equality that
+can finally be proven by Eq.refl or rfl, which the tactic will
+apply for you. As an example, here is how we can use the *simp*
+tactic to obtain a proof term that shows that *(0, -1) = 1* in
+the real numbers, and is thus on the unit circle.
 @@@ -/
 
-example : unitCircle 0 (-1) :=
+def zeroMinusOneOnUnitCircle : unitCircle 0 (-1) :=
 by
   simp [unitCircle]
 
 /- @@@
-Wow, ok! Lean doesn't just support direct programming
-of proof terms by hand, as we've been doing all along,
-but provides a huge library of tactics for helping to
-prove all kinds of propositions. The translation of
-the tactic-built proof that *simp* finds for you into
-English is easy. You can just say, *by the definition
-of unitCircle* (and other basic rules of algebra), the
-proposition is easily proved.
+The keyword, *by*, places Lean in *tactic mode*. It
+is in this mode that you can run tactics. In general
+you can mix *term* and *tactic* modes in constructing
+proofs in Lean. We will see more of tactics later on.
+
+Here we run *simp*, informing it of the definition
+of the definition of *unitCircle*. This tactic will
+then combine this definition with other dedinitions
+in its database, to try to prove the goal. Here, the
+tactic succeeds in producing a proof term that Lean
+then checks and accepts.
+
+Tactics do not always succeed. In that case you will
+get an error message and your proof state (sequent) will
+be unchanged. Moreover, even if a mistake was made in the
+implementation of a tactic, Lean still checks the proof
+terms it produces, just as if you had produced them by hand.
+Tactics are thus not of the correctness-critical part of
+Lean, and even if buggy tactics succeed in producing bad
+proof terms, Lean will still check, and not accept, them.
+
+You don't ordinarily see the *proof terms*  that tactics
+construct. You can nevertheless now have confidence that
+*(0, -1)* is on the unit circle in the Cartesian plan, as
+Lean has checked and accepted the generated proof term.
+
+The translation into English of the tactic-built proof that
+*simp* finds for you into English is easy. You can just say,
+*by the definition of unitCircle* and other rules of real
+arithmetic, the proposition evidently valid. QED.
 @@@ -/
 
 /- @@@
+### You Can See What Reasoning Principles It Used
+
 For those interested in futher study, Lean has a
 ton of options you can set to have it tell you more
 or less information as it goes. The following option
 tells Lean to tell you what facts the simp tactic uses
-in trying to produce a proof for you. Don't worry about
-the details, just be happy you did not have to construct
-that proof by hand!
+in trying to produce a proof for you. Hover over *simp*
+(now with a blue underline in VSCode) to see what facts
+*simp* used. Don't worry about details, just be happy
+you did not have to construct that proof by hand!
 @@@ -/
 
 set_option tactic.simp.trace true in
@@ -1272,6 +1417,8 @@ example : unitCircle 0 (-1) :=
 
 
 /- @@@
+### Proving Propositions About the Real Unit Circle
+
 Now that we have the tools we need to prove propositions
 about membership in the unitCircle relation, we should be
 all set to prove propositions about membership in the image
@@ -1336,7 +1483,96 @@ Exists.intro
   )
 
 /- @@@
-## Conclusion
+### A Few More Useful Tactics
+
+As a final example, let's see how one might construct such a
+proof in tactic mode.
+@@@ -/
+
+#reduce (types := true) -1 ∈ unitCircle.image { 0, 1 }
+
+example : -1 ∈ unitCircle.image { 0, 1 } :=
+by                  -- enter tactic mode
+  /- @@@
+  We need to show there's an x in { 0, 1 } such that
+  (x, -1) is on the unit circle. Clearly x = 0 will do.
+  So we use the *apply* tactic to apply the introduction
+  rule for exists with 0 as a witness, leaving the proof
+  argument to be provided separately. We use an _ to make
+  it clear that we're leaving this proof term to be given
+  later. Hovering over the _ (or checking the Info View)
+  confirms that all that remains to be provided is this
+  proof, namely a proof of *0 ∈ {0, 1} ∧ unitCircle 0 (-1)*.
+  @@@ -/
+  apply Exists.intro 0 _
+
+  /- @@@
+  The proof that remains to be provided is a proof of the
+  conjunction, *0 ∈ {0, 1} ∧ unitCircle 0 (-1)*. To prove
+  it we apply the introduction rule for ∧, leaving the two
+  proof arguments to be provided separately. Note that the
+  proof context now has two goals pending, one for each of
+  the conjuncts.
+  @@@ -/
+  apply And.intro _ _
+  /- @@@
+  We can use curly braces and indenting to make tactic-based
+  proofs easier to read. Here we prove each conjunct in its
+  own { ... } construct.
+
+  @@@ -/
+  {
+    /- @@@
+    The membership predicate here is a disjunction, so we
+    apply the rule for Or introduction, here on the left,
+    with only a simple equality to prove thereafter.
+    @@@ -/
+    apply Or.inl _
+    apply rfl
+  }
+  {
+    -- The proof of this conjunct is as explained above.
+    simp [unitCircle]
+  }
+
+/- @@@
+Lean provides tactics to automate the application of the
+right rules. Here's the same proof again.
+@@@ -/
+  example : -1 ∈ unitCircle.image { 0, 1 } :=
+  by
+    use 0         -- give witness for proving ∃
+    constructor   -- applies only constructor for goal
+    {
+      left          -- applies Or.inl
+      rfl           -- applies rfl
+    }
+    simp [unitCircle]
+
+/- @@@
+Finally, tactics can be composed into larger tactics.
+Here we sequentially compose the tactics from the proof
+just given into one big tactic, using ; to compose them.
+
+As you can see, tactics make it easier to give compact
+proof construction instructions. The results however are
+not always very easy to understand. You have to know what
+a lot of tactics do *under the hood*. What you can do to
+gain insight is to step through such a tactic-based proof
+construction and watch how each steps transforms your
+context. Give it a try for yourself, with the Info View
+open, put your cursor before each tactic in sequence and
+see how the proof state changes until the last remaining
+details are given.
+@@@ -/
+
+
+example : -1 ∈ unitCircle.image { 0, 1 } :=
+ by use 0; constructor; left; rfl; simp [unitCircle]
+
+
+/- @@@
+## What's Next?
 
 This lesson has introduced you to the formal definition and
 principles for reasoning about binary relations. In the next
