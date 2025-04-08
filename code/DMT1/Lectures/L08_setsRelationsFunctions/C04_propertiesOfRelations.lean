@@ -19,7 +19,7 @@ section we'll formally define some of the most important.
 @@@-/
 
 /- @@@
-### Being an Empty Relation
+### Empty Relation
 
 We start with the simple property of a relation being *empty*.
 That is, no value pairs satisfy its membership predicate. We
@@ -47,6 +47,8 @@ binary relation from a single type, *α*, to itself. A relation of
 this kind is called *homogeneous*, or an *endorelation*. We will
 use the identifier *e* for any endorelation.
 @@@ -/
+
+section properties
 
 variable
   {α β : Type u}  -- arbitrary types as implicit parameters
@@ -81,7 +83,7 @@ desugared term as in the first version of *isEmpty* above.
 
 
 /- @@@
-### Being a Complete Relation
+### Complete Relation
 
 The property of a relation relating every pair of values.
 We call such a relation *complete*. NOTE: We've corrected
@@ -108,7 +110,7 @@ fun _ _ => True.intro
 
 
 /- @@@
-### Being a Total Relation
+### Total Relation
 A relation is said to be *total* if it relates every
 value in its domain of definition to some output value.
 In other words, a relation is total if its *domain* is
@@ -118,7 +120,7 @@ def isTotalRel := ∀ (x : α), ∃ (y : β), r x y
 
 
 /- @@@
-### Being a Single-Valued Relation
+### Single-Valued Relation
 
 A binary relation is said to be *single-valued* if no
 input is related to more than one *output*. This is the
@@ -137,7 +139,7 @@ def isSingleValuedRel := ∀ x y z, r x y → r x z → y = z
 
 
 /- @@@
-### Being a Surjective Relation
+### Surjective Relation
 
 A relation is called *surjective* if it relates some
 input to *every* output in its codomain. That is, for
@@ -150,7 +152,7 @@ def isSurjectiveRel :Prop := ∀ (y : β), ∃ (x : α), r x y
 
 
 /- @@@
-### Being an Injective Relation
+### Injective Relation
 
 A relation is said to be *injective* if there is no
 more than one input that is related to any given output.
@@ -162,7 +164,7 @@ def isInjectiveRel :=
 
 
 /- @@@
-### Being a Many-To-One Relation
+### Many-To-One Relation
 A many-to-one relation is one that is not injective.
 In other words, it's not the case that every input
 maps to at most one output value.
@@ -171,7 +173,7 @@ maps to at most one output value.
 def isManyToOneRel := ¬isInjectiveRel r
 
 /- @@@
-### Being a One-To-Many Relation
+### One-To-Many Relation
 
 A relation is said to be one to many if it allows
 one input to map to multiple outputs while still
@@ -184,7 +186,7 @@ def isOneToMany :Prop :=
   isInjectiveRel r
 
 /- @@@
-### Being a Many-To-Many Relation
+### Many-To-Many Relation
 A relation is said to be many to many if it is neither
 functional (so some input maps to multiple outputs) not
 injective (so multiple inputs map to some single output).
@@ -202,7 +204,7 @@ def isManyToMany :=
 
 
 /- @@@
-### Being a Function
+### Function
 We define an alias, *isFunction*, for the property
 of being single-valued.
 @@@ -/
@@ -211,7 +213,7 @@ def isFunction : Rel α β → Prop :=
 
 
 /- @@@
-### Being a Total Function
+### Total Function
 
 A total function is a function that is total as a
 relation, i.e., it maps every input to some output.
@@ -221,7 +223,7 @@ def isTotalFun := isFunction r ∧ isTotalRel r
 
 
 /- @@@
-### Being an Injective Function
+### Injective Function
 
 The term, injective, is usually applied only to
 functions. This and the following few definitions
@@ -246,7 +248,7 @@ def isOneToOneFun : Rel α β → Prop :=
 
 
 /- @@@
-### Being a Surjective Function
+### Surjective Function
 
 Tbe be a surjective function is to be a function
 (single-valued) and to be surjective as a relation.
@@ -270,7 +272,7 @@ def isOntoFun : Rel α β → Prop :=
 
 
 /- @@@
-### Being a Bijective Function
+### Bijective Function
 
 A *total* function is that is injective and surjective
 is said to be *bijective*. Being bijective in this sense
@@ -360,7 +362,7 @@ of the following relations are transitive?
 @@@ -/
 
 /- @@@
-### Being an Equivalence Relation
+### Equivalence Relation
 @@@ -/
 
 -- The property of partitioning inputs into equivalence classes
@@ -413,7 +415,7 @@ Orderings are a crucial class of relations.
 @@@ -/
 
 /- @@@
-### Being a Partial Order
+### Partial Order
 @@@ -/
 
 def isPartialOrder :=
@@ -422,7 +424,12 @@ def isPartialOrder :=
     isTransitiveRel    e
 
 /- @@@
-### Being a Total Order
+### Strict Partial Order
+@@@ -/
+
+
+/- @@@
+### Total Order
 @@@ -/
 
 def isTotalOrder :=
@@ -433,7 +440,12 @@ def isLinearOrder : Rel α α → Prop := isTotalOrder
 
 
 /- @@@
-### Being a Preorder
+### Strict Total Order
+@@@ -/
+
+
+/- @@@
+### Preorder
 
 A preorder is a relation that is Reflexive and Transitive.
 
@@ -442,13 +454,9 @@ example of a preorder.
 @@@ -/
 
 /- @@@
-More to come.
-
-### Strict Partial Order
-
-### Strict Total Order
-
 ### Well Order
+
+<future>
 @@@ -/
 
 
@@ -555,17 +563,64 @@ property of being transitive generalized over all relations.
 @@@ -/
 
 
+
 /- @@@
-## Examples: Proving Properties of Relations
+Thus ends our section on properties of relations.
+@@@ -/
+end properties
+
+
+/- @@@
+## Proving Properties of Relations
 @@@ -/
 
 /- @@@
+To prove that some relation, r, has some property P,
+assert and and show that there is a proof of (P r).
+
+As an example, let's assert and prove that equality
+on the natural numbers is *total*. In other words,
+we claim that there's a proof of the *proposition*,
+*isTotal (@Eq Nat)*. Recall that the @ disables the
+inference of implement arguments, here allowing the
+type, Nat, to be given explicitly.
+
+One of the first steps in getting to a proof of such
+a proposition is to reduce the name of the property,
+such as *isTotalRel*, to its definition, and in Lean
+to its representation, as a logical predicate.
+
+In an English language proof, you might say, "By
+the definition of *isTotalRel*, it will suffice for
+us to to show that *∀ x, ∃ y, r x y*." You then go
+on to prove that more transparent form of the basic
+proposition at hand.
+
+In Lean it's the same. You can *unfold* (expand)
+the definition of a term, such as *isTotalRel*, in
+a larger expression using the *unfold* tactic.
+@@@ -/
+
+example : isTotalRel (@Eq Nat) :=
+  by
+    unfold isTotalRel
+    sorry     -- Exercise!
+
+
+/- @@@
+## Exercises
+
 ### A Reflexive Endorelation is Necessarily Total
 @@@ -/
 
 example : isReflexiveRel e → isTotalRel e :=
 by
-  _
+  intro h
+  unfold isReflexiveRel at h
+  unfold isTotalRel
+  intro a
+  use a
+  exact (h a)
 
 
 /- @@@
@@ -668,5 +723,151 @@ example : isInjectiveFun r → isFunction (r.inv) :=
   -- assume r.inv associatss c with both b and a
       fun rinvcb rinvca =>
         hinjr.right b a c rinvcb rinvca
+
+
+
+/- @@@
+## Homework
+
+In this part of homework, we state and prove, as a theorem,
+the proposition that, for any natural number, *n*, the *congruence
+mod n* relation, on natural numbers, *a* and *b,* is an equivalence
+relation. We formalize these ideas by defining *congModN (n : Nat)*
+to be a *family of relations, one for each value of n*, each being a
+(different) equivalence relation on the natural numbers. That's not
+Lean, that's just the mathematics. The last detail, for a given *n*,
+is to specify the relation membership predicate on pairs, *(a, b).*
+Here, it will be that *1%n = b%n*.
+@@@ -/
+
+def congModN (n : Nat) : Rel Nat Nat :=
+                      -- for a given n
+  fun a b =>          -- the binary predicate
+    a % n = b % n     -- that defines (congModN n)
+
+
+
+/- @@@
+HOMEWORK PROBLEM #1: FINISH IT OFF.
+
+To get further warmed up, let's prove a congruence
+for some particular *n*. Let's make it *3*. So what
+we expect is that *0, 3, 6, ...* will be congruent
+mod n (mod 3). So will be *1, 4, 7, ...* And also
+*2, 5, 8, ...*. We don't have to say *3, 6, 9,* as
+they are just elements in the equivalence class for
+0. So here we go: congruence mod 3 is an equivalence
+relation.
+@@@ -/
+
+/- @@@
+### Congruence Mod 3 is an Equivalence Relation
+@@@ -/
+
+example : isEquivalence (congModN 3) :=
+by
+  unfold isEquivalence
+  /- @@@
+  By the definition of equivalence, we must show
+  ```lean
+    isReflexiveRel (congModN 3) ∧
+    isSymmetricRel (congModN 3) ∧
+    isTransitiveRel (congModN 3)
+  @@@ -/
+  constructor   -- applies first ∧ constructor
+
+  /- @@@
+  On ∧.left we need a prove that (congModN 3) is reflexive
+  And on the right, that it's symmetrical and transitive
+  @@@ -/
+
+  -- reflexive
+  unfold isReflexiveRel
+  intro n
+  unfold congModN
+  rfl
+
+  -- split conjunction
+  constructor
+
+  -- symmetric
+  unfold isSymmetricRel
+  intro a b
+  unfold congModN
+  intro h
+  rw [h]
+
+  -- transitive
+
+-- EXERCISE: fill this hole.
+  sorry
+
+
+/- @@@
+### Congruence Mod n is an Equivalence Relation
+
+Now we state and prove that for any n, conguence mod n is
+an equivalence relation.
+@@@ -/
+
+example : ∀ (n : Nat), isEquivalence (congModN n) :=
+fun n =>
+  And.intro
+  (
+    fun a =>
+      rfl
+  )
+  (
+    And.intro
+    (
+      fun a b h =>
+        by
+          simp [congModN] at h
+          simp [congModN]
+          rw [h]
+    )
+    (
+      fun a b c hab hbc =>
+        by
+          simp [congModN] at hab
+          simp [congModN] at hbc
+          simp [congModN]
+          rw [hab]
+          assumption
+    )
+  )
+
+/- @@@
+### The Subset Relation is a Partial Order
+
+@@@ -/
+theorem subsetPO (α : Type): isPartialOrder (@subSetRel α) :=
+by
+  unfold isPartialOrder
+  apply And.intro
+    (
+      by
+        unfold isReflexiveRel
+        intro s
+        unfold subSetRel
+        intro t
+        intro h
+        assumption
+    )
+    (
+      -- EXERCISE: Fill these holes.
+      And.intro
+        sorry
+        sorry
+    )
+
+/- @@@
+### Well Founded Relations
+
+
+
+@@@ -/
+
+
 
 end DMT1.Lectures.setsRelationsFunctions.propertiesOfRelations
