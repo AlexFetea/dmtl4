@@ -1,9 +1,10 @@
+```lean
 import Mathlib.Algebra.Group.Defs
 import Mathlib.Algebra.Group.Action.Defs
 
 import DMT1.Lectures.L09_classes.C01_groups
+```
 
-/- @@@
 # Group Actions
 
 Mathematicians of think of the elements of a group as
@@ -32,8 +33,8 @@ will be able to compute a robot's new state when it is
 acted upon by a rotation.
 
 Let's define our triangular robot type.
-@@@ -/
 
+```lean
 namespace DMT1.Lecture.classes.groupActions
 
 open DMT1.Lecture.classes.groups
@@ -44,9 +45,9 @@ inductive Tri where
 | o240
 
 open Tri
+```
 
 
-/- @@@
 Just as we can have additive and multiplicative groups
 (depending on whether the operator acts like + or like
 *), we can have additive and multiplicative group actions.
@@ -61,11 +62,11 @@ is specified by the AddAction typeclass. Instantiating this
 class will provide the +ᵥ notation, shorthand for *vadd,*
 the operation that will apply an action to an object. This
 typeclass will turn rotations into actions on robots.
-@@@ -/
 
+```lean
 #check AddAction
+```
 
-/- @@@
 ```lean
 class AddAction (G : Type*) (P : Type*) [AddMonoid G] extends VAdd G P where
   /-- Zero is a neutral element for `+ᵥ` -/
@@ -73,9 +74,7 @@ class AddAction (G : Type*) (P : Type*) [AddMonoid G] extends VAdd G P where
   /-- Associativity of `+` and `+ᵥ` -/
   add_vadd : ∀ (g₁ g₂ : G) (p : P), (g₁ + g₂) +ᵥ p = g₁ +ᵥ g₂ +ᵥ p
 ```
-@@@ -/
 
-/- @@@
 We can see that the *AddAction* typeclass is parameterized by two
 types: *G* and *P*. *G* will be our group of actions (here required
 only to be a monoid). *P* will be the type of objects acted upon.
@@ -84,8 +83,8 @@ To instantiate the class, we will need three elements:
 - an instance of the *VAdd* class, defining (overloading) +ᵥ
 - show that the group zero element is "no action"
 - show that applying a sum of actions is the same as one at a time
-@@@ -/
 
+```lean
 open Rot
 
 def vaddRotTri : Rot → Tri → Tri
@@ -125,8 +124,8 @@ instance : VAdd Rot Tri :=
 {
   vadd := vaddRotTri
 }
+```
 
-/- @@@
 ```lean
 class AddAction (G : Type*) (P : Type*) [AddMonoid G] extends VAdd G P where
   /-- Zero is a neutral element for `+ᵥ` -/
@@ -134,8 +133,8 @@ class AddAction (G : Type*) (P : Type*) [AddMonoid G] extends VAdd G P where
   /-- Associativity of `+` and `+ᵥ` -/
   add_vadd : ∀ (g₁ g₂ : G) (p : P), (g₁ + g₂) +ᵥ p = g₁ +ᵥ g₂ +ᵥ p
 ```
-@@@ -/
 
+```lean
 instance : AddAction Rot Tri :=
 {
   zero_vadd := vaddZero
@@ -145,13 +144,14 @@ instance : AddAction Rot Tri :=
 #eval Rot.r120 +ᵥ Tri.o0                -- o120
 #eval Rot.r120 +ᵥ (Rot.r120 +ᵥ Tri.o0)  -- o240
 #eval (Rot.r120 + Rot.r120) +ᵥ Tri.o0   -- 0240
+```
 
-/- @@@
 Group actions must have this property that you can
 add them up in the group (+) then *apply* them once
 (+ᵥ) rather than applying each one in turn using +ᵥ.
 That's a great way to optimize batter power usage in
 a floor-vacuuming robot.
-@@@ -/
 
+```lean
 end DMT1.Lecture.classes.groupActions
+```
