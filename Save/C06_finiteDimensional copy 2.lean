@@ -148,6 +148,9 @@ instance [Zero α]: Zero (Fin n → α) := ⟨ fun _ => 0 ⟩
 #check (0 : Fin 3 → Nat)
 
 
+instance {α : Type} (n : Nat) [Sub α]: Sub (Fin n → α) where
+  sub x y := fun i => x i - y i
+
 /-@@@
 Now we turn to equality. We'll provide two definitions, the
 first (Eq) logical, the second (BEq) computational returning
@@ -253,10 +256,14 @@ instance : CoeFun (Tuple α n) (fun _ => Fin n → α) := ⟨Tuple.toFun⟩
 instance [Add α] : Add (Tuple α n) where
   add x y :=  ⟨ x + y ⟩
 
+instance [Sub α] : Sub (Tuple α n) where
+  sub x y := ⟨ x - y ⟩
+
 
 -- Element-wise multiplication
 instance [Mul α] : Mul (Tuple α n) where
   mul x y := ⟨ x * y ⟩
+
 
 -- Element-wise negation
 instance [Neg α] : Neg (Tuple α n) where
@@ -271,6 +278,8 @@ instance [SMul R α] : SMul R (Tuple α n) where
 instance [Zero α]: Zero (Tuple α n) :=
   { zero := ⟨ 0 ⟩ }
 
+
+
 /- @@@
 ### Example
 @@@ -/
@@ -281,8 +290,12 @@ def myTuple : Tuple ℚ 3 := ⟨ aFinTuple ⟩
 def v1 := myTuple
 def v2 := 2 • v1
 def v3 := v2 + 2 • v2
+
 #eval v1 == v1
-#eval v1 == v2
+#eval v1 = v2
+#eval -v1
+#eval v2 - v1
+
 
 
 /- @@@
@@ -479,3 +492,47 @@ instance {α : Type u} {n : Nat} [Ring α]: AddGroup (Vc α n) :=
 instance {α : Type u} {n : Nat} [Ring α]: AddTorsor (Vc α n) (Pt α n) :=
 {
 }
+
+/- @@@
+## Coordinates
+
+
+@@@ -/
+
+example (f g : Fin 3 → ℚ) : f + g = fun i => f i + g i := rfl
+#check inferInstanceAs (AddCommGroup (Fin 3 → ℚ))
+
+#check myTuple
+#check (myTuple : Fin 3 → ℚ)
+
+#eval myTuple 3   -- uses coercion from Tuple to Fin n → ℚ
+
+@[ext]
+theorem Tuple.ext {α : Type u} {n : ℕ} {t u : Tuple α n} :
+    (∀ i, t i = u i) → t = u := by
+  intro h
+  apply congrArg Tuple.mk
+  funext
+  rename_i idx
+  exact (h idx)
+
+
+instance [AddCommGroup α] : AddCommGroup (Tuple α n) :=
+  { add := (· + ·)
+    zero := 0
+    neg := Neg.neg
+    sub := Sub.sub
+    nsmul := λ k x => ⟨k • x⟩
+    zsmul := λ k x => ⟨k • x⟩
+    add_assoc := by intros; ext; apply add_assoc
+    zero_add := by intros; ext; apply zero_add
+    add_zero := by intros; ext; apply add_zero
+    add_comm := by intros; ext; apply add_comm
+    neg_add_cancel := by intros; ext; apply neg_add_cancel
+  }
+
+#check inferInstanceAs (AddCommGroup (Tuple ℚ 3))
+
+def foo : (AddCommGroup (Tuple ℚ 3)) := inferInstance
+#reduce foo
+#eval foo.add

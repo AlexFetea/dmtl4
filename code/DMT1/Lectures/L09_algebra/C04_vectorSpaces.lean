@@ -1,10 +1,9 @@
-```lean
 import Mathlib.Data.Rat.Defs
 import Mathlib.Algebra.Module.Basic
 --import Mathlib.LinearAlgebra.AffineSpace.Defs
 import Mathlib.Tactic.Ring.Basic
-```
 
+/- @@@
 <!-- toc -->
 
 # Modules and Vector Spaces
@@ -117,8 +116,10 @@ vector space defined in this chapter. To define our vector
 space, in turn, requires that we specify both *scalar* and
 *vector* types. We will take the rationals as our scalars,
 and will define a new type, *Vc*, of vectors. So here we go.
+@@@ -/
 
 
+/- @@@
 ## Scalars
 
 In our work to date, scalars have been values from a monoid
@@ -152,11 +153,11 @@ laws.
 In Lean, we express the requirement that the scalars form a field by
 declaring that there must be an instance of the *Field* typeclass for
 whatever type *K* is defined to be.
+@@@ -/
 
-```lean
 abbrev K := ℚ
-```
 
+/- @@@
 Note that if you set *K* to *Nat* (not a field) you will *not* get a
 type error at this point. The variable declaration asserts only the
 requirement that there be such a typeclass but Lean does not verify
@@ -166,31 +167,33 @@ tries to find an instance, that Lean will complain.
 
 You can see this idea in action by changing *K* from ℚ to *Nat* in the
 preceding definition.
+@@@ -/
 
-```lean
 def invK (a : K) := a⁻¹   -- returns the multiplicative inverse of a K
 #eval invK 3              -- but fails to synthesize [Field K] if K = Nat
-```
 
+/- @@@
 Now remember to change *K* back to meaning *Q* and all will be well.
 Later on you can try changing it to ℝ.
 
 At this point we've done everything we need to establish the rationals
 as a scalar field. That was easy.
+@@@ -/
 
 
 
 
+/- @@@
 ## "Vectors"
+@@@ -/
 
-```lean
 structure Vc : Type where
 (val : K)
 
 -- definition of vector (Vc) addition
 def addVc (v1 v2 : Vc) := Vc.mk (v1.val + v2.val)
-```
 
+/- @@@
 Now we want to show that the set of *Vc* objects
 forms a *module*. A module is just a bit less than
 a vector space, in that the scalars need only come
@@ -203,11 +206,11 @@ structure of a module by instantiating Lean's *Module*
 typeclass for the type, *Vc*.
 
 ## Modules
+@@@ -/
 
-```lean
 #check Module
-```
 
+/- @@@
 Here's the *Module* typeclass type:
 ```lean
 Module.{u, v} (R : Type u) (M : Type v) [Semiring R] [AddCommMonoid M] : Type (max u v)Lean 4
@@ -226,11 +229,11 @@ by providing a typeclass instance for us. We can either
 write *instance : Semiring K := {}* or use the *variable*
 construct, as we did above, to tell Lean that we require
 and assume there is such a typeclass instance.
-```lean
+@@@ -/
 -- variable [Semiring K]
 -- TODO: Fix that and above
-```
 
+/- @@@
 The other typeclass instance we need is *AddCommMonoid Vc*.
 *AddCommMonoid*, like many typeclasses, extends (essentially
 inherits from) other finer-grained typeclasses, with the end
@@ -247,8 +250,8 @@ will tell you what fields you're missing. Next, add the fields
 and stub out the values using sorry. Finally provide the actual
 values needed. In this way you can avoid the tedium of tracking
 down and instantiating all of the parent typeclasses.
+@@@ -/
 
-```lean
 instance : Zero Vc := { zero := Vc.mk 0 }
 instance : Add Vc := { add := addVc }
 
@@ -257,7 +260,7 @@ instance : AddCommMonoid Vc :=
   add := addVc      -- we had to define Vc addition
   add_assoc := by   -- we need a proof it's associative
     intro a b c     -- assume a, b, c are Vc's
-```
+/- @@@
 Our goal now is to show *a + b + c = a + (b + c)*.
 To do this, we need to show that the rational
 numbers representing the vectors on either side
@@ -283,9 +286,10 @@ side of the equality as applications of *Vc.mk* to
 underlying *rational* values. The representations
 of the vectors are thus exposed, and now all that
 is needed is to show that these rationals are equal.
-```lean
+@@@ -/
     apply congrArg Vc.mk
-```
+
+/- @@@
 Note that the *+* in the expression, *a + b* within
 parentheses in the goal is *Vc* addition, but the *+*
 between the *.val* expressions is *rational* addition.
@@ -293,7 +297,7 @@ Lean already know that that's associative, so all we
 have to do now is to apply Lean's general theorem
 (*Rat.add_assoc*) to this special case to finish off
 the proof.
-```lean
+@@@ -/
     apply Rat.add_assoc
 
   zero := Vc.mk 0
@@ -309,14 +313,14 @@ the proof.
     apply congrArg Vc.mk
     simp
     rfl
-```
 
-  At this point, you really will have to go back
-  to just before this typeclass instance definition
-  and define typeclass instances for *Zero Vc* and
-  for *Add Vc*. When you come back here, the error
-  should be resolved.
-```lean
+/- @@@
+At this point, you really will have to go back
+to just before this typeclass instance definition
+and define typeclass instances for *Zero Vc* and
+for *Add Vc*. When you come back here, the error
+should be resolved.
+@@@ -/
   nsmul := nsmulRec
 
   add_comm := by
@@ -324,8 +328,8 @@ the proof.
     apply congrArg Vc.mk
     apply Rat.add_comm
 }
-```
 
+/- @@@
 There! With the constraints on the *K* and *Vc*
 types required by *Module* now proven, we can now
 take the second step and instantiate *Module K Vc*
@@ -340,12 +344,14 @@ values inline. For example, it'd be a good idea to
 define *smul* as a standalone function. This is the
 operaton of multiplication (scaling) of a vector,
 *v*, by  a scalar, *k*, still denoted as *k • v*.
+@@@ -/
 
+/- @@@
 EXERCISE
-```lean
+@@@ -/
 def smulKVc (k : K) (v : Vc) : Vc := Vc.mk (k * v.val)
-```
 
+/- @@@
 To finish off the instance definition establishing
 *Vc* as a *module over the field, K*, i.e., with its
 scalars coming from *K*, we will first need to build
@@ -363,8 +369,8 @@ reduce expressions using the ring operators, *+* and
 do that to both the left and the right side of the
 goals in the following proofs, at which point *ring1*
 sees that the two sides are equal and applies *rfl*.
+@@@ -/
 
-```lean
 instance : Semiring K :=
 {
   left_distrib := by
@@ -426,16 +432,16 @@ instance : Module K Vc :=
   zero_smul := by
     sorry
 }
-```
 
+/- @@@
 ## Vector Spaces
 
 Hooray! We've now established that *Vc* forms a *module*
 under scalar multiplication by rationals. And because the
 rationals form not just a *ring* (in which case we'd still
 have a nice *module), but a *field*, we have a vector space!
+@@@ -/
 
-```lean
 def v1 : Vc := ⟨3.5⟩
 def v2 : Vc := ⟨5.5⟩
 def v3 := v1 + v2         -- expect ⟨9⟩
@@ -443,47 +449,47 @@ def v4 := (2.0 : K) • v3  -- expect ⟨18⟩
 
 #eval v3          -- 9
 #eval! v4         -- 18 (delete ! when sorrys are gone)
-```
 
+/- @@@
 We haven't yet overloaded the inverse or subtraction
 operators for *Vc*. So the following expressions will
 not be accepted. Uncomment them to see the error.
+@@@ -/
 
-```lean
 -- def v5 := -v4
 -- def v6 := v3 - v2
-```
 
+/- @@@
 This problem is easy to fix: overload these operators
-```lean
+@@@ -/
 instance : Neg Vc := { neg := fun v => (-1 : K) • v}
 instance : Sub Vc := { sub := fun v2 v1 => ⟨ v2.val - v1.val ⟩ }
-```
 
+/- @@@
 Now it works.
-```lean
+@@@ -/
 def v5 := -v4
 def v6 := v3 - v5
-```
 
+/- @@@
 Note also that even though we've concrete *represented*
 a vector as a rational number, we can't add rations and
 vectors, as that's not an operation that makes any sense
 and we haven't defined such an operation. Uncomment the
 following line to see the error.
+@@@ -/
 
-```lean
 -- #eval (3/2 : ℚ) + v5    -- no heterogeneous rat + vc op
 -- #eval v5 + (3/2 : ℚ)    -- no heterogeneous vc + rat op
-```
 
+/- @@@
 As a final step, to gain the notations provided by the
 AddGroup typeclass, we'll instantiate it for our *Vc* type.
 That will requireOur goal now is show proofs that our definitions satisfy a few
 more simple axioms. You can finish the proofs.
 
 [EXERCISE] Replace the sorry's with valid proofs.
-```lean
+@@@ -/
 theorem neg_add_cancelVC : ∀ (a : Vc), -a + a = 0 :=
 sorry
 
@@ -496,8 +502,9 @@ instance : AddGroup Vc :=
   neg_add_cancel := neg_add_cancelVC
   sub_eq_add_neg := sub_eq_add_negVc
 }
-```
 
+/- @@@
 So there we have it. An 1-dimensional rational vector
 space, for which we've also instantiated *AddGroup* which
 we'll need in the next chapter.
+@@@ -/

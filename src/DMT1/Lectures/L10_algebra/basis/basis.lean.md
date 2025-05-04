@@ -1,3 +1,4 @@
+```lean
 import Mathlib.Data.Rat.Defs
 import Mathlib.Algebra.Group.Defs
 import Mathlib.Algebra.Module.Basic
@@ -11,12 +12,12 @@ import Mathlib.Data.Matrix.Basic
 import Mathlib.LinearAlgebra.Determinant
 import Mathlib.Algebra.Module.LinearMap.Defs
 import DMT1.Lectures.L10_algebra.torsor.torsor
+```
 
 
-/- @@@
 PLEASE IGNORE THIS FILE. UNDER CONSTRUCTION.
-@@@ -/
 
+```lean
 namespace DMT1.Lecture.Bases
 
 open DMT1.Algebra.Vector
@@ -27,9 +28,9 @@ universe u
 variable
   {n : Nat}
   {α : Type u}
+```
 
 
-/- @@@
 Bases. Lean's linear algebra library has rich support for formal
 reasoning. Unfortulately for our computational purposes, much of
 it is noncomputable. We want foundationally verified computation.
@@ -44,20 +45,20 @@ in the linear algebra library's design.
 The most interesting is that we impose coordinates on a space of
 objects by establishing a bijection between objects, on one hand,
 and coordinate tuples, on the other other.
-@@@ --/
 
 
+```lean
 namespace AffBasis
+```
 
-/- @@@
 ## LinearEquivalence
 
 ```lean
 M ≃ₗ [R] M₂ denotes the type of linear equivalences between M and M₂ over a plain linear map M →ₗ M₂.
 A linear equivalence comprises transformations in each direction and proofs of linearity axioms.
 ```
-@@@ -/
 
+```lean
 def equivVcTuple [AddCommGroup α] [Semiring α] [Module α α] : Vc α n ≃ₗ[α] Tuple α n where
   -- to and from coordinates relative to a std basis on this space (we normalize eagerly right now)
   toFun := fun v => v.toRep
@@ -88,12 +89,12 @@ theorem vcTuple.equiv_apply
 theorem vcTuple.equiv_symm_apply
  [AddCommGroup α] [Semiring α] [Module α α]
  (t : Tuple α n) : equivVcTuple.symm t = ⟨t⟩ := rfl
+```
 
-/- @@@
 ## Vectors
-@@@ -/
 
 
+```lean
 -- TODO: Release note. Simplification.
 -- Vectors, with constructor parameters (1, 0), (0, 1), and (0, 2)
 -- def vc0 : Vc ℚ 2 := ⟨ ⟨ fun i => match i with | 0 => 1 | 1 => 0 ⟩ ⟩
@@ -104,12 +105,12 @@ def vc0 : Vc ℚ 2 := ⟨ fun i => match i with | 0 => 1 | 1 => 0 ⟩
 def vc1 : Vc ℚ 2 := ⟨ fun i => match i with | 0 => 0 | 1 => 1 ⟩
 def vc1': Vc ℚ 2 := ⟨ fun i => match i with | 0 => 0 | 1 => 2 ⟩
 -- Nicer
+```
 
 
-/- @@@
 ## MATRIX VcTuple c r
-@@@ -/
 
+```lean
 def twoVc := fun (i : Fin 2) => match i with | 0 => vc0 | 1 => vc1'
 
 #eval twoVc 0
@@ -134,9 +135,9 @@ structure LinearMap {R S : Type*} [Semiring R] [Semiring S] (σ : R →+* S) (M 
     AddHom M M₂, MulActionHom σ M M₂
 ```
 -/
+```
 
 
-/- @@@
 
 A LinearMap satisfies:
 
@@ -145,8 +146,8 @@ A LinearMap satisfies:
 
 
 A simple version of a linear map from a module M₁ to a module M₂ rep. wrt stdBasis
-@@@ -/
 
+```lean
 structure LinearFinMap (α : Type u) (n m : ℕ) (dom codom : Type v)
   [Semiring α]
   [AddCommMonoid dom]
@@ -363,30 +364,28 @@ structure LinEquiv (α : Type u) (n : Nat) (M₁ M₂ : Type u)
 --   simp
 --   rfl
 -- end FinVec
+```
 
 
 
 
-/- @@@
 ## Basis
-@@@ -/
 
+```lean
 structure Basis (α : Type u) (n : Nat) [AddCommGroup α] [Semiring α] [Module α α]  where
 rep :
   Vc α n ≃ₗ[α] Tuple α n
-/- @@@
+```
 You get a pair of functions, Vc to Tuple ("coordinates"), and Tuple ("coordinates") to Vc,
 satisfying specific linearity constraints.
-@@@ -/
 
 
 
-/- @@@
 ## Linear Maps
 We might avoid going down this path for a bit. What we need and now have are linear equivalences.
 
 https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap
-@@@ -/
+```lean
 #check LinearEquiv.mk
 
 
@@ -471,13 +470,13 @@ It’s short for LinearMap ℚ M N where:
 
     N is the codomain.
 -/
+```
 
 
 
 
-/- @@@
 ## Why Won't LinearAlgebra Compute
-@@@ -/
+```lean
 open Finsupp
 #check (@Basis.mk)
 def vs : Fin 2 →₀ Vc ℚ 2 :=
@@ -516,8 +515,8 @@ axiom li : LinearIndependent ℚ vs
 axiom sp : ⊤ ≤ Submodule.span ℚ (Set.range ⇑vs)
 
 def myBasis := Basis.mk li sp
+```
 
-/- @@@
 ```lean
 @Basis.mk : {ι : Type u_1} →
   {R : Type u_2} →                                -- scalar type implicit
@@ -530,9 +529,10 @@ def myBasis := Basis.mk li sp
             ⊤ ≤ Submodule.span R (Set.range v)    -- explicit proof
 → Basis ι R M
 ```
-@@@ -/
 
 
+```lean
 end AffFrame
 
 end DMT1.Lecture.Bases
+```

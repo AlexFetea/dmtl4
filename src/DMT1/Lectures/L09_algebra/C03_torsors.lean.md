@@ -1,7 +1,8 @@
-import DMT1.Lectures.L09_classes.C02_groupActions
+```lean
+import DMT1.Lectures.L09_algebra.C02_groupActions
 import Mathlib.Algebra.AddTorsor.Defs
+```
 
-/- @@@
 <!-- toc -->
 
 # Torsors Over Groups
@@ -9,25 +10,25 @@ import Mathlib.Algebra.AddTorsor.Defs
 NB: This chapter is currently formatted as a
 homework assignment, with many blanks left to
 fill in.
-@@@ -/
 
+```lean
 namespace DMT1.Lecture.classes.torsors
 
 open DMT1.Lecture.classes.groupActions
 open DMT1.Lecture.classes.groups
+```
 
-/- @@@
 We've seen how group elements can act on
 objects. Let's now consider a special case,
 where vectors in a vector space are actions,
 and where they act on points in a linear space
 by *displacing* (rather than, say, *rotating*)
 them.
-@@@ -/
 
+```lean
 #check AddTorsor
+```
 
-/- @@@
 Paraphrasing the documentation for AddTorsor in
 Lean's *mathlib* we find that an `AddTorsor G P`
 gives a structure to a *nonempty* type `P`, acted on
@@ -82,8 +83,8 @@ The second torsor law says that if you have an action
 then if from that new point you subtract the original
 point, *p*, the result is just exactly the action that
 got you from *p* to *g +ᵥ p*. The algebra makes sense.
-@@@ -/
 
+```lean
 -- EXERCISE: Define point-point subtraction for Rot, Tri
 open Rot
 
@@ -98,14 +99,14 @@ instance : VSub Rot Tri :=
 sorry
 
 -- Exercise: Instantiate NonEmpty for Tri.
+```
 
-/- @@@
 ```
 class inductive Nonempty (α : Sort u) : Prop where
   | intro (val : α) : Nonempty α
 ```
-@@@ -/
 
+```lean
 theorem nonemptyTri: Nonempty Tri :=
 sorry
 
@@ -130,3 +131,4 @@ sorry
 #check AddMonoid
 
 end DMT1.Lecture.classes.torsors
+```
